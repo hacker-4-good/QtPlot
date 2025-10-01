@@ -1,2 +1,2 @@
 # QtPlot
-Creating a QtPlot Visualization software
+Creating a QtPlot Visualization software (Free for everyone) 
