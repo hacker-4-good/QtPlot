@@ -3,6 +3,7 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from widgets.table_editor import TableEditor 
 from widgets.plot_widget import PlotWidget
+from widgets.chat_widget import ChatWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -32,12 +33,23 @@ class MainWindow(QMainWindow):
         scatter_action.triggered.connect(lambda: self.show_plot("scatter"))
         bar_action.triggered.connect(lambda: self.show_plot("bar"))
 
+        # Chatbot menu under Analysis
+        analysis_menu = menu.addMenu("&Chat")
+        open_chat_action = QAction("Open Chatbot", self)
+        analysis_menu.addAction(open_chat_action)
+        open_chat_action.triggered.connect(self.show_chatbot)
+
         # Add the TableEditor as the central widget (single-page)
         self.table_editor = TableEditor()
         self.setCentralWidget(self.table_editor)
 
         # single dock for plots (reuse)
         self.plot_dock: QDockWidget | None = None
+        # single dock for chatbot (reuse)
+        self.chat_dock: QDockWidget | None = None
+
+        # keep a reference to the last created plot widget so chat can attach to it
+        self.last_plot_widget: PlotWidget | None = None
 
     def show_plot(self, plot_type: str):
         title = f"Plot - {plot_type.capitalize()}"
@@ -47,6 +59,7 @@ class MainWindow(QMainWindow):
             plot_widget = PlotWidget(self, table=self.table_editor)
             self.plot_dock.setWidget(plot_widget)
             self.addDockWidget(Qt.RightDockWidgetArea, self.plot_dock)
+            self.last_plot_widget = plot_widget
         else:
             self.plot_dock.setWindowTitle(title)
             plot_widget = self.plot_dock.widget()
@@ -55,12 +68,35 @@ class MainWindow(QMainWindow):
                 self.plot_dock.setWidget(plot_widget)
             else:
                 plot_widget.table_owner = self.table_editor
+            self.last_plot_widget = plot_widget
         # set desired plot type and update selectors
         plot_widget.current_plot_type = plot_type
         plot_widget.update_index_options()
         # initial plot attempt
         plot_widget.plot(plot_type)
         self.plot_dock.show()
+
+    def show_chatbot(self):
+        title = "Chatbot"
+        if self.chat_dock is None:
+            self.chat_dock = QDockWidget(title, self)
+            self.chat_dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+            # attach current plot if exists (otherwise chat can still use table)
+            chat_widget = ChatWidget(self, table_editor=self.table_editor, plot_widget=self.last_plot_widget)
+            self.chat_dock.setWidget(chat_widget)
+            self.addDockWidget(Qt.RightDockWidgetArea, self.chat_dock)
+        else:
+            self.chat_dock.setWindowTitle(title)
+            chat_widget = self.chat_dock.widget()
+            if chat_widget is None or not isinstance(chat_widget, ChatWidget):
+                chat_widget = ChatWidget(self, table_editor=self.table_editor, plot_widget=self.last_plot_widget)
+                self.chat_dock.setWidget(chat_widget)
+            else:
+                # update references to latest table/plot
+                chat_widget.table_editor = self.table_editor
+                chat_widget.plot_widget = self.last_plot_widget
+        self.chat_dock.show()
+
 
 if __name__ == "__main__":
     app = QApplication([])
