@@ -1,6 +1,7 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
+import csv
 
 
 class TableEditor(QWidget):
@@ -106,3 +107,44 @@ class TableEditor(QWidget):
             item = self.table.item(r, c)
             if item:
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
+
+    def load_csv(self, filepath: str, has_header: bool = True, encoding: str = "utf-8"):
+        """
+        Load CSV from filepath into the table.
+        If has_header is True, the first CSV row becomes horizontal headers.
+        """
+        try:
+            with open(filepath, newline="", encoding=encoding) as f:
+                reader = csv.reader(f)
+                rows = [row for row in reader]
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to read CSV:\n{e}")
+            return
+
+        if not rows:
+            QMessageBox.information(self, "Empty", "CSV file is empty.")
+            return
+
+        # determine max columns in case of ragged rows
+        max_cols = max(len(r) for r in rows)
+
+        if has_header:
+            headers = rows[0] + [""] * (max_cols - len(rows[0]))
+            data_rows = rows[1:]
+        else:
+            headers = [f"Col {i}" for i in range(max_cols)]
+            data_rows = rows
+
+        self.table.setColumnCount(max_cols)
+        self.table.setRowCount(len(data_rows))
+        self.table.setHorizontalHeaderLabels(headers)
+
+        for r, row in enumerate(data_rows):
+            for c in range(max_cols):
+                text = row[c] if c < len(row) else ""
+                item = QTableWidgetItem(text)
+                item.setFlags(item.flags() | Qt.ItemIsEditable)
+                self.table.setItem(r, c, item)
+
+        self.structure_changed.emit()
+        self.data_changed.emit()
