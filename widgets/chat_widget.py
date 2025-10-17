@@ -7,8 +7,7 @@ import dspy
 from dotenv import load_dotenv
 import io
 import csv
-
-load_dotenv
+load_dotenv()
 
 llm = dspy.LM(model="ollama/llama3.2:latest")
 dspy.settings.configure(lm=llm)
@@ -18,12 +17,14 @@ class PlotInsightSignature(dspy.Signature):
     """
     This signature aims to fetch the required insight for given plot
     **start by explaining the domain of plot**
-    You are free to elaborate based upon your need just focus on respective domain of question
+    -> You are free to elaborate based upon your need just focus on respective domain of question
+    -> you're free to use maths calculation on data if user such query
+    -> You also get the tabular data and have to perform statistical analysis on the same
     """
     plot_figure = dspy.InputField(desc = "This will contain Plotly fig of the plot")
-    data = dspy.InputField(desc="This will provide you the dataset on which analysis to be done")
+    data = dspy.InputField(desc="This will provide you the dataset on which analysis to be done in string format")
     user_query = dspy.InputField(desc="User's query")
-    insights = dspy.OutputField(desc="Provide elaborated insight about the plot possibly in MARKDOWN")
+    insights = dspy.OutputField(desc="Provide elaborated insight about the plot possibly in MARKDOWN and also have to do calculation")
 
 class ChatWidget(QWidget):
     """
