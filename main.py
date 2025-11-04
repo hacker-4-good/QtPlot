@@ -64,7 +64,7 @@ class MainWindow(QMainWindow):
         # ask whether first row is header
         resp = QMessageBox.question(self, "CSV header", "Does the CSV include a header row?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.Yes)
         has_header = resp == QMessageBox.StandardButton.Yes
-        self.table_editor.load_csv(path, has_header=has_header)
+        self.table_editor.load_csv_in_background(path, has_header=has_header)
 
     def show_plot(self, plot_type: str):
         title = f"Plot - {plot_type.capitalize()}"

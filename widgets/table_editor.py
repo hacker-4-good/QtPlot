@@ -1,9 +1,69 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, Signal, QObject, QThread
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QTableWidget, QAbstractItemView, QTableWidgetItem,
+    QInputDialog, QMessageBox, QProgressBar, QLabel
+)
 import csv
+import os
 
 
+# ---------------- Worker Thread for Background CSV Loading ----------------
+class CSVLoaderWorker(QObject):
+    chunk_loaded = Signal(list)   # Emits list of rows (list[list[str]])
+    finished = Signal()
+    error = Signal(str)
+
+    def __init__(self, filepath, has_header=True, encoding="utf-8", chunk_size=1000):
+        super().__init__()
+        self.filepath = filepath
+        self.has_header = has_header
+        self.encoding = encoding
+        self.chunk_size = chunk_size
+        self._running = True
+
+    def stop(self):
+        """Stop loading early (if user cancels)."""
+        self._running = False
+
+    def run(self):
+        """Runs in background thread, loads file chunk by chunk."""
+        try:
+            with open(self.filepath, newline="", encoding=self.encoding) as f:
+                reader = csv.reader(f)
+                first_row = next(reader, None)
+                if first_row is None:
+                    self.error.emit("Empty CSV file.")
+                    return
+
+                if self.has_header:
+                    headers = first_row
+                else:
+                    headers = [f"Col {i}" for i in range(len(first_row))]
+                    self.chunk_loaded.emit([first_row])
+
+                # Emit header as first chunk
+                self.chunk_loaded.emit(["__HEADER__", headers])
+
+                chunk = []
+                for row in reader:
+                    if not self._running:
+                        break
+                    chunk.append(row)
+                    if len(chunk) >= self.chunk_size:
+                        self.chunk_loaded.emit(chunk)
+                        chunk = []
+
+                # Emit last partial chunk
+                if chunk:
+                    self.chunk_loaded.emit(chunk)
+
+                self.finished.emit()
+        except Exception as e:
+            self.error.emit(str(e))
+
+
+# ---------------- Table Editor UI ----------------
 class TableEditor(QWidget):
     structure_changed = Signal()
     data_changed = Signal()
@@ -12,7 +72,7 @@ class TableEditor(QWidget):
         super().__init__()
         layout = QVBoxLayout(self)
 
-        # toolbar for adding/removing rows/columns
+        # Toolbar
         toolbar = QHBoxLayout()
         add_row_btn = QPushButton("Add Row")
         add_col_btn = QPushButton("Add Column")
@@ -25,126 +85,122 @@ class TableEditor(QWidget):
         toolbar.addStretch()
         layout.addLayout(toolbar)
 
+        # Progress info
+        self.status_label = QLabel("")
+        self.progress = QProgressBar()
+        self.progress.setRange(0, 0)  # indeterminate
+        self.progress.hide()
+        layout.addWidget(self.status_label)
+        layout.addWidget(self.progress)
+
+        # Table
         self.table = QTableWidget()
-        self.table.setRowCount(3)
-        self.table.setColumnCount(2)
-        self.table.setHorizontalHeaderLabels(["Name", "Age"])
-
-        self.table.setItem(0,0,QTableWidgetItem("Alice"))
-        self.table.setItem(0,1,QTableWidgetItem("30"))
-        self.table.setItem(1,0,QTableWidgetItem("Bob"))
-        self.table.setItem(1,1,QTableWidgetItem("24"))
-        self.table.setItem(2,0,QTableWidgetItem("Charlie"))
-        self.table.setItem(2,1,QTableWidgetItem("35"))
-
-        # allow multi-cell selection with mouse
         self.table.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.table.setSelectionBehavior(QAbstractItemView.SelectItems)
-
-        # make items editable
-        for row in range(self.table.rowCount()):
-            for col in range(self.table.columnCount()):
-                item = self.table.item(row, col)
-                if item:
-                    item.setFlags(item.flags() | Qt.ItemIsEditable)
-
         layout.addWidget(self.table)
 
-        # connections
+        # Connections
         add_row_btn.clicked.connect(self.add_row)
         add_col_btn.clicked.connect(self.add_column)
         remove_row_btn.clicked.connect(self.remove_selected_row)
         remove_col_btn.clicked.connect(self.remove_selected_column)
-        self.table.itemChanged.connect(self._on_item_changed)
-        # emit structure_changed on selection changes so plot widget can react if needed
-        self.table.itemSelectionChanged.connect(self._on_selection_changed)
 
-    def _on_item_changed(self, item: QTableWidgetItem):
-        # ensure editable flag kept and emit data_changed
-        item.setFlags(item.flags() | Qt.ItemIsEditable)
-        self.data_changed.emit()
+        self.table.itemChanged.connect(lambda _: self.data_changed.emit())
 
-    def _on_selection_changed(self):
-        # Notify that structure/selection changed (used by plot widget's "use selection")
-        self.structure_changed.emit()
+        # Thread-related attributes
+        self._thread = None
+        self._worker = None
 
+    # ----------------------------------------------------------------------
     def add_row(self):
         r = self.table.rowCount()
-        self.table.setRowCount(r + 1)
+        self.table.insertRow(r)
         for c in range(self.table.columnCount()):
             self.table.setItem(r, c, QTableWidgetItem(""))
-        self._set_items_editable_in_row(r)
-        self.structure_changed.emit()
 
     def add_column(self):
         c = self.table.columnCount()
-        self.table.setColumnCount(c + 1)
-        default_name = f"Col {c}"
-        text, ok = QInputDialog.getText(self, "New column", "Column name:", text=default_name)
-        header = text if ok and text.strip() != "" else default_name
+        text, ok = QInputDialog.getText(self, "New column", "Column name:", text=f"Col {c}")
+        name = text if ok and text.strip() else f"Col {c}"
+        self.table.insertColumn(c)
         headers = [self.table.horizontalHeaderItem(i).text() if self.table.horizontalHeaderItem(i) else f"Col {i}" for i in range(c)]
-        headers.append(header)
+        headers.append(name)
         self.table.setHorizontalHeaderLabels(headers)
-        # fill items
-        for r in range(self.table.rowCount()):
-            self.table.setItem(r, c, QTableWidgetItem(""))
-        self.structure_changed.emit()
 
     def remove_selected_row(self):
-        selected = self.table.currentRow()
-        if selected >= 0:
-            self.table.removeRow(selected)
-            self.structure_changed.emit()
+        i = self.table.currentRow()
+        if i >= 0:
+            self.table.removeRow(i)
 
     def remove_selected_column(self):
-        selected = self.table.currentColumn()
-        if selected >= 0:
-            self.table.removeColumn(selected)
-            self.structure_changed.emit()
+        i = self.table.currentColumn()
+        if i >= 0:
+            self.table.removeColumn(i)
 
-    def _set_items_editable_in_row(self, r):
-        for c in range(self.table.columnCount()):
-            item = self.table.item(r, c)
-            if item:
-                item.setFlags(item.flags() | Qt.ItemIsEditable)
-
-    def load_csv(self, filepath: str, has_header: bool = True, encoding: str = "utf-8"):
-        """
-        Load CSV from filepath into the table.
-        If has_header is True, the first CSV row becomes horizontal headers.
-        """
-        try:
-            with open(filepath, newline="", encoding=encoding) as f:
-                reader = csv.reader(f)
-                rows = [row for row in reader]
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to read CSV:\n{e}")
+    # ----------------------------------------------------------------------
+    def load_csv_in_background(self, filepath: str, has_header=True, encoding="utf-8", chunk_size=2000):
+        """Load CSV in background thread without freezing UI."""
+        if not os.path.exists(filepath):
+            QMessageBox.critical(self, "Error", f"File not found: {filepath}")
             return
 
-        if not rows:
-            QMessageBox.information(self, "Empty", "CSV file is empty.")
+        # Clear table and start progress
+        self.table.clear()
+        self.table.setRowCount(0)
+        self.table.setColumnCount(0)
+        self.status_label.setText(f"Loading {os.path.basename(filepath)} ...")
+        self.progress.show()
+
+        # Start background thread
+        self._thread = QThread()
+        self._worker = CSVLoaderWorker(filepath, has_header, encoding, chunk_size)
+        self._worker.moveToThread(self._thread)
+
+        # Connect signals
+        self._thread.started.connect(self._worker.run)
+        self._worker.chunk_loaded.connect(self._append_csv_chunk)
+        self._worker.finished.connect(self._on_load_finished)
+        self._worker.error.connect(self._on_load_error)
+        self._worker.finished.connect(self._thread.quit)
+        self._worker.finished.connect(self._worker.deleteLater)
+        self._thread.finished.connect(self._thread.deleteLater)
+
+        # Run
+        self._thread.start()
+
+    # ----------------------------------------------------------------------
+    def _append_csv_chunk(self, chunk):
+        """Add chunk of rows to table incrementally."""
+        if not chunk:
             return
 
-        # determine max columns in case of ragged rows
-        max_cols = max(len(r) for r in rows)
+        # Header chunk
+        if len(chunk) == 2 and chunk[0] == "__HEADER__":
+            headers = chunk[1]
+            self.table.setColumnCount(len(headers))
+            self.table.setHorizontalHeaderLabels(headers)
+            return
 
-        if has_header:
-            headers = rows[0] + [""] * (max_cols - len(rows[0]))
-            data_rows = rows[1:]
-        else:
-            headers = [f"Col {i}" for i in range(max_cols)]
-            data_rows = rows
+        # Regular data rows
+        start = self.table.rowCount()
+        self.table.setRowCount(start + len(chunk))
+        col_count = self.table.columnCount()
 
-        self.table.setColumnCount(max_cols)
-        self.table.setRowCount(len(data_rows))
-        self.table.setHorizontalHeaderLabels(headers)
+        for i, row in enumerate(chunk):
+            for j in range(col_count):
+                text = row[j] if j < len(row) else ""
+                self.table.setItem(start + i, j, QTableWidgetItem(text))
 
-        for r, row in enumerate(data_rows):
-            for c in range(max_cols):
-                text = row[c] if c < len(row) else ""
-                item = QTableWidgetItem(text)
-                item.setFlags(item.flags() | Qt.ItemIsEditable)
-                self.table.setItem(r, c, item)
-
-        self.structure_changed.emit()
         self.data_changed.emit()
+        self.status_label.setText(f"Loaded {self.table.rowCount()} rows...")
+
+    # ----------------------------------------------------------------------
+    def _on_load_finished(self):
+        self.progress.hide()
+        self.status_label.setText(f"Loaded all {self.table.rowCount()} rows ✅")
+        self.data_changed.emit()
+
+    def _on_load_error(self, msg):
+        self.progress.hide()
+        QMessageBox.critical(self, "Error", f"Failed to load CSV:\n{msg}")
+
