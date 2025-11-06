@@ -7,42 +7,54 @@ import dspy
 from dotenv import load_dotenv
 import io
 import csv
+import traceback
+
 load_dotenv()
 
 llm = dspy.LM(model="ollama/llama3.2:latest")
 dspy.settings.configure(lm=llm)
 
-
 class PlotInsightSignature(dspy.Signature):
-    """
-    This signature aims to fetch the required insight for given plot
-    **start by explaining the domain of plot**
-    -> You are free to elaborate based upon your need just focus on respective domain of question
-    -> you're free to use maths calculation on data if user such query
-    -> You also get the tabular data and have to perform statistical analysis on the same
-    """
-    plot_figure = dspy.InputField(desc = "This will contain Plotly fig of the plot")
-    data = dspy.InputField(desc="This will provide you the dataset on which analysis to be done in string format")
+    plot_figure = dspy.InputField(desc="This will contain Plotly fig of the plot")
+    data = dspy.InputField(desc="This will provide dataset in string format")
     user_query = dspy.InputField(desc="User's query")
-    insights = dspy.OutputField(desc="Provide elaborated insight about the plot possibly in MARKDOWN and also have to do calculation")
+    insights = dspy.OutputField(desc="Provide elaborated insight about the plot in MARKDOWN")
 
+# ---------- Worker thread class ----------
+class ModelWorker(QThread):
+    finished = Signal(str)  # emits response text
+
+    def __init__(self, user_query, data_text, plot_bytes):
+        super().__init__()
+        self.user_query = user_query
+        self.data_text = data_text
+        self.plot_bytes = plot_bytes
+
+    def run(self):
+        try:
+            model = dspy.ChainOfThought(signature=PlotInsightSignature)
+            result = model(
+                plot_figure=self.plot_bytes,
+                data=self.data_text,
+                user_query=self.user_query
+            )
+            text = result.insights or "Model returned no insights."
+        except Exception as e:
+            text = f"Error querying model:\n{traceback.format_exc()}"
+        self.finished.emit(text)
+
+# ---------- Main Chat Widget ----------
 class ChatWidget(QWidget):
-    """
-    Simple chatbot UI that can send the current table and/or current plot to dspy for insights.
-    Uses Signature defined above if dspy.run is available, otherwise attempts to call llm directly.
-    """
     def __init__(self, parent=None, table_editor: TableEditor | None = None, plot_widget: PlotWidget | None = None):
         super().__init__(parent)
         self.table_editor = table_editor
         self.plot_widget = plot_widget
+        self.worker = None
 
         layout = QVBoxLayout(self)
-
-        # conversation display
         self.conv = QTextBrowser()
         layout.addWidget(self.conv)
 
-        # controls: include data/plot checkboxes
         opts_layout = QHBoxLayout()
         self.include_data_cb = QCheckBox("Include table data")
         self.include_plot_cb = QCheckBox("Include current plot image")
@@ -52,7 +64,6 @@ class ChatWidget(QWidget):
         opts_layout.addStretch()
         layout.addLayout(opts_layout)
 
-        # input area
         input_layout = QHBoxLayout()
         self.input_edit = QLineEdit()
         self.send_btn = QPushButton("Send")
@@ -72,16 +83,11 @@ class ChatWidget(QWidget):
             return ""
         output = io.StringIO()
         writer = csv.writer(output)
-        headers = []
-        for c in range(tw.columnCount()):
-            hi = tw.horizontalHeaderItem(c)
-            headers.append(hi.text() if hi else f"Col{c}")
+        headers = [tw.horizontalHeaderItem(c).text() if tw.horizontalHeaderItem(c) else f"Col{c}"
+                   for c in range(tw.columnCount())]
         writer.writerow(headers)
         for r in range(tw.rowCount()):
-            row = []
-            for c in range(tw.columnCount()):
-                item = tw.item(r, c)
-                row.append(item.text() if item else "")
+            row = [tw.item(r, c).text() if tw.item(r, c) else "" for c in range(tw.columnCount())]
             writer.writerow(row)
         return output.getvalue()
 
@@ -91,7 +97,6 @@ class ChatWidget(QWidget):
             return None
         buf = io.BytesIO()
         try:
-            # save current figure to PNG bytes
             pw.figure.savefig(buf, format="png", bbox_inches="tight")
             return buf.getvalue()
         except Exception:
@@ -99,31 +104,29 @@ class ChatWidget(QWidget):
 
     def on_send(self):
         user_text = self.input_edit.text().strip()
-        if user_text == "":
+        if not user_text:
             return
+
         self.append_message("User", user_text)
+        self.append_message("System", "<i>🧠 Thinking... please wait</i>")
 
-        # prepare data and plot if requested
-        data_text = None
-        plot_bytes = None
-        if self.include_data_cb.isChecked() and self.table_editor is not None:
-            data_text = self.table_to_csv_text()
-        if self.include_plot_cb.isChecked() and self.plot_widget is not None:
-            plot_bytes = self.capture_plot_png()
+        data_text = self.table_to_csv_text() if self.include_data_cb.isChecked() else None
+        plot_bytes = self.capture_plot_png() if self.include_plot_cb.isChecked() else None
 
-        # send to dspy/signature if available, otherwise attempt direct call
-        self.append_message("System", "Querying model...")
-        QApplication.processEvents()
+        # Disable input during processing
+        self.send_btn.setEnabled(False)
+        self.input_edit.setEnabled(False)
 
-        response_text = None
-        try:
-            model = dspy.ChainOfThought(signature=PlotInsightSignature)
-            response_text = model(plot_figure = plot_bytes, data = data_text, user_query=user_text).insights
-        except Exception as e:
-            response_text = f"Error querying model: {e}"
+        # Start worker thread
+        self.worker = ModelWorker(user_text, data_text, plot_bytes)
+        self.worker.finished.connect(self.on_model_finished)
+        self.worker.start()
 
-        if not response_text:
-            response_text = "Model returned no insights."
+    def on_model_finished(self, response_text: str):
+        # Re-enable UI
+        self.send_btn.setEnabled(True)
+        self.input_edit.setEnabled(True)
 
-        self.append_message("Chatbot", response_text)
+        # Remove loader and show output
+        self.conv.append(f"<b>Chatbot:</b> {response_text}")
         self.input_edit.clear()

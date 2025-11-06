@@ -191,7 +191,7 @@ class PlotWidget(QWidget):
                     return
                 x_positions = list(range(len(y_values)))
                 if plot_type == "line":
-                    ax.plot(x_positions, y_values, marker='o', label=table_widget.horizontalHeaderItem(col).text() if table_widget.horizontalHeaderItem(col) else f"Col {col}")
+                    ax.plot(x_positions, y_values, marker='-', label=table_widget.horizontalHeaderItem(col).text() if table_widget.horizontalHeaderItem(col) else f"Col {col}")
                 elif plot_type == "scatter":
                     ax.scatter(x_positions, y_values, c='tab:blue')
                 elif plot_type == "bar":
