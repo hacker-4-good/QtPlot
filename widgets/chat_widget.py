@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import io
 import csv
 import traceback
+import os 
 
 load_dotenv()
 
@@ -15,6 +16,7 @@ llm = dspy.LM(model="ollama/llama3.2:latest")
 dspy.settings.configure(lm=llm)
 
 class PlotInsightSignature(dspy.Signature):
+    """Give fast response to the user's query"""
     plot_figure = dspy.InputField(desc="This will contain Plotly fig of the plot")
     data = dspy.InputField(desc="This will provide dataset in string format")
     user_query = dspy.InputField(desc="User's query")
