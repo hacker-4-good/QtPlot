@@ -4,6 +4,8 @@ from PySide6.QtWidgets import *
 from widgets.table_editor import TableEditor 
 from widgets.plot_widget import PlotWidget
 from widgets.chat_widget import ChatWidget
+import os 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -56,6 +58,128 @@ class MainWindow(QMainWindow):
 
         # keep a reference to the last created plot widget so chat can attach to it
         self.last_plot_widget: PlotWidget | None = None
+
+        self.create_toolbar()
+    
+    def create_toolbar(self):
+        toolbar = QToolBar("Main Toolbar", self)
+        toolbar.setIconSize(QSize(20, 20))
+        toolbar.setMovable(False)
+        toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
+
+        self.addToolBar(Qt.TopToolBarArea, toolbar)
+
+        file_icon = QAction(QIcon(f"{BASE_DIR}/images/file_icon.png"), "", self)
+        file_icon.setToolTip("Open a new project")
+        toolbar.addAction(file_icon)
+
+        new_function_icon = QAction(QIcon(f"{BASE_DIR}/images/function_icon.png"), "", self)
+        new_function_icon.setToolTip("Create a new 2D function plot")
+        toolbar.addAction(new_function_icon)
+
+        new_project_icon = QAction(QIcon(f"{BASE_DIR}/images/project_icon.png"), "", self)
+        new_project_icon.setToolTip("Open project")
+        toolbar.addAction(new_project_icon)
+
+        save_project_icon = QAction(QIcon(f"{BASE_DIR}/images/save_project_icon.png"), "", self)
+        save_project_icon.setToolTip("Save Project")
+        toolbar.addAction(save_project_icon)
+
+        save_project_as_icon = QAction(QIcon(f"{BASE_DIR}/images/save_project_as_icon.png"), "", self)
+        save_project_as_icon.setToolTip("Save Project As")
+        toolbar.addAction(save_project_as_icon)
+
+        import_data_icon = QAction(QIcon(f"{BASE_DIR}/images/import_data_icon.png"), "", self)
+        import_data_icon.setToolTip("Import Data File(s)")
+        toolbar.addAction(import_data_icon)
+
+        duplicate_window_icon = QAction(QIcon(f"{BASE_DIR}/images/duplicate_window_icon.png"), "", self)
+        duplicate_window_icon.setToolTip("Duplicate Window")
+        toolbar.addAction(duplicate_window_icon)
+
+        print_window_icon = QAction(QIcon(f"{BASE_DIR}/images/print_window_icon.png"), "", self)
+        print_window_icon.setToolTip("Print Window")
+        toolbar.addAction(print_window_icon)
+
+        print_preview_icon = QAction(QIcon(f"{BASE_DIR}/images/print_preview_icon.png"), "", self)
+        print_preview_icon.setToolTip("Print Preview")
+        toolbar.addAction(print_preview_icon)
+
+        export_pdf_icon = QAction(QIcon(f"{BASE_DIR}/images/export_pdf_icon.png"), "", self)
+        export_pdf_icon.setToolTip("Export to PDF")
+        toolbar.addAction(export_pdf_icon)
+
+        project_explorer_icon = QAction(QIcon(f"{BASE_DIR}/images/project_explorer_icon.png"), "", self)
+        project_explorer_icon.setToolTip("Show Project Explorer")
+        toolbar.addAction(project_explorer_icon)
+
+        analysis_result_icon = QAction(QIcon(f"{BASE_DIR}/images/analysis_result_icon.png"), "", self)
+        analysis_result_icon.setToolTip("Show Analysis Result")
+        toolbar.addAction(analysis_result_icon)
+
+        serial_monitor_icon = QAction(QIcon(f"{BASE_DIR}/images/serial_monitor_icon.png"), "", self)
+        serial_monitor_icon.setToolTip("Serial Monitor")
+        toolbar.addAction(serial_monitor_icon)
+
+        undo_icon = QAction(QIcon(f"{BASE_DIR}/images/undo_icon.png"), "", self)
+        undo_icon.setToolTip("Undo Changes")
+        toolbar.addAction(undo_icon)
+
+        redo_icon = QAction(QIcon(f"{BASE_DIR}/images/redo_icon.png"), "", self)
+        redo_icon.setToolTip("Redo Changes")
+        toolbar.addAction(redo_icon)
+
+        cut_selection_icon = QAction(QIcon(f"{BASE_DIR}/images/cut_selection_icon.png"), "", self)
+        cut_selection_icon.setToolTip("Cut selection")
+        toolbar.addAction(cut_selection_icon)
+
+        copy_selection_icon = QAction(QIcon(f"{BASE_DIR}/images/copy_selection_icon.png"), "", self)
+        copy_selection_icon.setToolTip("Copy selection")
+        toolbar.addAction(copy_selection_icon)
+
+        paste_selection_icon = QAction(QIcon(f"{BASE_DIR}/images/paste_selection_icon.png"), "", self)
+        paste_selection_icon.setToolTip("Paste selection")
+        toolbar.addAction(paste_selection_icon)
+
+        delete_selection_icon = QAction(QIcon(f"{BASE_DIR}/images/delete_selection_icon.png"), "", self)
+        delete_selection_icon.setToolTip("Delete selection")
+        toolbar.addAction(delete_selection_icon)
+
+        line_plot_icon = QAction(QIcon(f"{BASE_DIR}/images/line_plot_icon.png"), "", self)
+        line_plot_icon.setToolTip("Plot as Line")
+        toolbar.addAction(line_plot_icon)
+
+        symbols_plot_icon = QAction(QIcon(f"{BASE_DIR}/images/symbols_plot_icon.png"), "", self)
+        symbols_plot_icon.setToolTip("Plot as Symbols")
+        toolbar.addAction(symbols_plot_icon)
+
+        line_symbols_plot_icon = QAction(QIcon(f"{BASE_DIR}/images/line_symbols_plot_icon.png"), "", self)
+        line_symbols_plot_icon.setToolTip("Plot as Line + Symbols")
+        toolbar.addAction(line_symbols_plot_icon)
+
+        bar_plot_icon = QAction(QIcon(f"{BASE_DIR}/images/bar_plot_icon.png"), "", self)
+        bar_plot_icon.setToolTip("Plot with verticle bars")
+        toolbar.addAction(bar_plot_icon)
+
+        plot_area_icon = QAction(QIcon(f"{BASE_DIR}/images/plot_area_icon.png"), "", self)
+        plot_area_icon.setToolTip("Plot area")
+        toolbar.addAction(plot_area_icon)
+
+        box_plot_icon = QAction(QIcon(f"{BASE_DIR}/images/box_plot_icon.png"), "", self)
+        box_plot_icon.setToolTip("Box and Whisker Plot")
+        toolbar.addAction(box_plot_icon)
+
+        vectors_icon = QAction(QIcon(f"{BASE_DIR}/images/vectors_icon.png"), "", self)
+        vectors_icon.setToolTip("Vectors XYXY")
+        toolbar.addAction(vectors_icon)
+
+        double_yaxis_icon = QAction(QIcon(f"{BASE_DIR}/images/double_yaxis_icon.png"), "", self)
+        double_yaxis_icon.setToolTip("Double Y axis")
+        toolbar.addAction(double_yaxis_icon)
+
+        bars_icon = QAction(QIcon(f"{BASE_DIR}/images/bars_icon.png"), "", self)
+        bars_icon.setToolTip("Inline Bars")
+        toolbar.addAction(bars_icon)
 
     def open_csv_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv);;All Files (*)")
