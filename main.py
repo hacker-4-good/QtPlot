@@ -7,10 +7,83 @@ from widgets.chat_widget import ChatWidget
 import os 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+class AddFunctionDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("QtiPlot - Add function curve")
+        self.setFixedSize(420, 450)
+        main_layout = QVBoxLayout(self)
+
+        # --- Curve Type ---
+        row1 = QHBoxLayout()
+        row1.addWidget(QLabel("Curve Type"))
+        self.curve_type = QComboBox()
+        self.curve_type.addItems(["Function", "Parametric Plot", "Polar Plot"])
+        row1.addWidget(self.curve_type)
+        main_layout.addLayout(row1)
+
+        # --- Comment --- 
+        row2 = QHBoxLayout()
+        row2.addWidget(QLabel("Comment"))
+        self.commit_edit = QLineEdit()
+        row2.addWidget(self.commit_edit)
+        main_layout.addLayout(row2)
+
+        # --- f(x) editor --- 
+        main_layout.addWidget(QLabel("f(x) ="))
+        self.function_edit = QTextEdit()
+        main_layout.addWidget(self.function_edit)
+
+        # --- From/To ---
+        row3 = QHBoxLayout()
+        row3.addWidget(QLabel("From x="))
+        self.from_spin = QDoubleSpinBox()
+        self.from_spin.setValue(0)
+        row3.addWidget(self.from_spin)
+
+        row3.addWidget(QLabel("To x="))
+        self.to_spin = QDoubleSpinBox()
+        self.to_spin.setValue(1)
+        row3.addWidget(self.to_spin)
+        main_layout.addLayout(row3)
+
+        # --- Points ---
+        row4 = QHBoxLayout()
+        row4.addWidget(QLabel("Points"))
+        self.point_spin = QSpinBox()
+        self.point_spin.setRange(2, 100000)
+        self.point_spin.setValue(100)
+        row4.addWidget(self.point_spin)
+        main_layout.addLayout(row4)
+
+        # --- Button --- 
+        btn_row = QHBoxLayout()
+        self.help_btn = QPushButton("Help")
+        self.add_btn = QPushButton("Add Function")
+        self.ok_btn = QPushButton("Ok")
+        self.close_btn = QPushButton("Close")
+
+        self.close_btn.clicked.connect(self.close)
+
+        btn_row.addWidget(self.help_btn)
+        btn_row.addWidget(self.add_btn)
+        btn_row.addWidget(self.ok_btn)
+        btn_row.addWidget(self.close_btn)
+
+        main_layout.addLayout(btn_row)
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("QtPlot")
+        self.resize(1200, 800)
+
+        # Workspace area 
+        self.mdi = QMdiArea()
+        self.setCentralWidget(self.mdi)
+        self.create_default_table()
+
+        self.mdi.subWindowActivated.connect(self.on_subwindow_activated)
 
         menu = self.menuBar()
         # keep file menu reference to add Open CSV
@@ -20,14 +93,18 @@ class MainWindow(QMainWindow):
         plot_menu = menu.addMenu("&Plot")
         menu.addMenu("&Analysis")
         menu.addMenu("&Statistics")
-        menu.addMenu("&Table")
+        table_menu = menu.addMenu("&Table")
         menu.addMenu("&Windows")
         menu.addMenu("&Help")
 
-        # File -> Open CSV action
+        # File -> Open CSV action, New Table
         open_csv_action = QAction("Open CSV...", self)
         file_menu.addAction(open_csv_action)
         open_csv_action.triggered.connect(self.open_csv_file)
+        new_table_action = QAction("New Table", self)
+        file_menu.addAction(new_table_action)
+        new_table_action.triggered.connect(self.new_table)
+        file_menu.addSeparator()
 
         # Plot actions
         line_action = QAction("Line plot", self)
@@ -47,9 +124,15 @@ class MainWindow(QMainWindow):
         analysis_menu.addAction(open_chat_action)
         open_chat_action.triggered.connect(self.show_chatbot)
 
+
+        # Table Menu
+        rename_table_action = QAction("Rename Table", self)
+        table_menu.addAction(rename_table_action)
+        rename_table_action.triggered.connect(self.rename_active_table)
+
         # Add the TableEditor as the central widget (single-page)
-        self.table_editor = TableEditor()
-        self.setCentralWidget(self.table_editor)
+        # self.table_editor = TableEditor()
+        # self.setCentralWidget(self.table_editor)
 
         # single dock for plots (reuse)
         self.plot_dock: QDockWidget | None = None
@@ -60,6 +143,41 @@ class MainWindow(QMainWindow):
         self.last_plot_widget: PlotWidget | None = None
 
         self.create_toolbar()
+
+    def on_subwindow_activated(self, sub):
+        if sub and isinstance(sub.widget(), TableEditor):
+            self.table_editor = sub.widget()
+
+    def new_table(self):
+        table = TableEditor()
+        sub = QMdiSubWindow()
+        sub.setWidget(table)
+        sub.setWindowTitle(f"Table{len(self.mdi.subWindowList())+1}")
+        sub.resize(600, 400)
+        self.mdi.addSubWindow(sub)
+        sub.show()
+        self.mdi.setActiveSubWindow(sub)
+        self.table_editor = table 
+
+    def rename_active_table(self):
+        sub= self.mdi.activeSubWindow()
+        if not sub or not isinstance(sub.widget(), TableEditor):
+            QMessageBox.information(self, "Rename Table", "No table is active")
+            return 
+        old_name = sub.windowTitle()
+        new_name, ok = QInputDialog.getText(self, "Rename Table", "New table name:", text=old_name)
+        if ok and new_name.strip():
+            sub.setWindowTitle(new_name.strip())
+
+    def create_default_table(self):
+        table = TableEditor()
+        sub = QMdiSubWindow()
+        sub.setWidget(table)
+        sub.setWindowTitle("Table1")
+        sub.resize(400, 300)
+        self.mdi.addSubWindow(sub)
+        sub.show()
+        self.table_editor = table
     
     def create_toolbar(self):
         toolbar = QToolBar("Main Toolbar", self)
@@ -72,10 +190,12 @@ class MainWindow(QMainWindow):
         file_icon = QAction(QIcon(f"{BASE_DIR}/images/file_icon.png"), "", self)
         file_icon.setToolTip("Open a new project")
         toolbar.addAction(file_icon)
+        file_icon.triggered.connect(self.open_file_window)
 
         new_function_icon = QAction(QIcon(f"{BASE_DIR}/images/function_icon.png"), "", self)
         new_function_icon.setToolTip("Create a new 2D function plot")
         toolbar.addAction(new_function_icon)
+        new_function_icon.triggered.connect(self.open_add_function_dialog)
 
         new_project_icon = QAction(QIcon(f"{BASE_DIR}/images/project_icon.png"), "", self)
         new_project_icon.setToolTip("Open project")
@@ -180,15 +300,52 @@ class MainWindow(QMainWindow):
         bars_icon = QAction(QIcon(f"{BASE_DIR}/images/bars_icon.png"), "", self)
         bars_icon.setToolTip("Inline Bars")
         toolbar.addAction(bars_icon)
+    
+    def open_add_function_dialog(self):
+        dialog = AddFunctionDialog(self)
+        dialog.exec()
 
+    def open_file_window(self):
+        self.file_window = MainWindow()
+        self.file_window.show()
+        self.file_window.raise_()
+        self.file_window.activateWindow()
+
+    # def open_csv_file(self):
+    #     path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv);;All Files (*)")
+    #     if not path:
+    #         return
+    #     # ask whether first row is header
+    #     resp = QMessageBox.question(self, "CSV header", "Does the CSV include a header row?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.Yes)
+    #     has_header = resp == QMessageBox.StandardButton.Yes
+    #     self.table_editor.load_csv_in_background(path, has_header=has_header)
     def open_csv_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv);;All Files (*)")
         if not path:
             return
-        # ask whether first row is header
-        resp = QMessageBox.question(self, "CSV header", "Does the CSV include a header row?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.Yes)
+
+        resp = QMessageBox.question(
+            self,
+            "CSV header",
+            "Does the CSV include a header row?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.Yes
+        )
         has_header = resp == QMessageBox.StandardButton.Yes
-        self.table_editor.load_csv_in_background(path, has_header=has_header)
+
+        table = TableEditor()
+        sub = QMdiSubWindow()
+        sub.setWidget(table)
+        sub.setAttribute(Qt.WA_DeleteOnClose)
+        sub.setWindowTitle(f"Table{len(self.mdi.subWindowList())+1}")
+        sub.resize(700, 500)
+
+        self.mdi.addSubWindow(sub)
+        sub.show()
+        self.mdi.setActiveSubWindow(sub)
+
+        table.load_csv_in_background(path, has_header=has_header)
+
 
     def show_plot(self, plot_type: str):
         title = f"Plot - {plot_type.capitalize()}"
