@@ -129,11 +129,7 @@ class MainWindow(QMainWindow):
         rename_table_action = QAction("Rename Table", self)
         table_menu.addAction(rename_table_action)
         rename_table_action.triggered.connect(self.rename_active_table)
-
-        # Add the TableEditor as the central widget (single-page)
-        # self.table_editor = TableEditor()
-        # self.setCentralWidget(self.table_editor)
-
+        
         # single dock for plots (reuse)
         self.plot_dock: QDockWidget | None = None
         # single dock for chatbot (reuse)
@@ -311,14 +307,6 @@ class MainWindow(QMainWindow):
         self.file_window.raise_()
         self.file_window.activateWindow()
 
-    # def open_csv_file(self):
-    #     path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv);;All Files (*)")
-    #     if not path:
-    #         return
-    #     # ask whether first row is header
-    #     resp = QMessageBox.question(self, "CSV header", "Does the CSV include a header row?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.Yes)
-    #     has_header = resp == QMessageBox.StandardButton.Yes
-    #     self.table_editor.load_csv_in_background(path, has_header=has_header)
     def open_csv_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv);;All Files (*)")
         if not path:
