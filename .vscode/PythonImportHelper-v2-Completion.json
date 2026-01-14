@@ -1,0 +1,410 @@
+[
+    {
+        "label": "*",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "Qt",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "Signal",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "QObject",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "QThread",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "PySide6.QtCore",
+        "description": "PySide6.QtCore",
+        "isExtraImport": true,
+        "detail": "PySide6.QtCore",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "PySide6.QtGui",
+        "description": "PySide6.QtGui",
+        "isExtraImport": true,
+        "detail": "PySide6.QtGui",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QVBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QHBoxLayout",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QPushButton",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTableWidget",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QAbstractItemView",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QTableWidgetItem",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QInputDialog",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QMessageBox",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QProgressBar",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "QLabel",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "PySide6.QtWidgets",
+        "description": "PySide6.QtWidgets",
+        "isExtraImport": true,
+        "detail": "PySide6.QtWidgets",
+        "documentation": {}
+    },
+    {
+        "label": "TableEditor",
+        "importPath": "widgets.table_editor",
+        "description": "widgets.table_editor",
+        "isExtraImport": true,
+        "detail": "widgets.table_editor",
+        "documentation": {}
+    },
+    {
+        "label": "TableEditor",
+        "importPath": "widgets.table_editor",
+        "description": "widgets.table_editor",
+        "isExtraImport": true,
+        "detail": "widgets.table_editor",
+        "documentation": {}
+    },
+    {
+        "label": "PlotWidget",
+        "importPath": "widgets.plot_widget",
+        "description": "widgets.plot_widget",
+        "isExtraImport": true,
+        "detail": "widgets.plot_widget",
+        "documentation": {}
+    },
+    {
+        "label": "PlotWidget",
+        "importPath": "widgets.plot_widget",
+        "description": "widgets.plot_widget",
+        "isExtraImport": true,
+        "detail": "widgets.plot_widget",
+        "documentation": {}
+    },
+    {
+        "label": "dspy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "dspy",
+        "description": "dspy",
+        "detail": "dspy",
+        "documentation": {}
+    },
+    {
+        "label": "load_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "io",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "io",
+        "description": "io",
+        "detail": "io",
+        "documentation": {}
+    },
+    {
+        "label": "csv",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "csv",
+        "description": "csv",
+        "detail": "csv",
+        "documentation": {}
+    },
+    {
+        "label": "traceback",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "traceback",
+        "description": "traceback",
+        "detail": "traceback",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "FigureCanvasQTAgg",
+        "importPath": "matplotlib.backends.backend_qtagg",
+        "description": "matplotlib.backends.backend_qtagg",
+        "isExtraImport": true,
+        "detail": "matplotlib.backends.backend_qtagg",
+        "documentation": {}
+    },
+    {
+        "label": "Figure",
+        "importPath": "matplotlib.figure",
+        "description": "matplotlib.figure",
+        "isExtraImport": true,
+        "detail": "matplotlib.figure",
+        "documentation": {}
+    },
+    {
+        "label": "pyplot",
+        "importPath": "matplotlib",
+        "description": "matplotlib",
+        "isExtraImport": true,
+        "detail": "matplotlib",
+        "documentation": {}
+    },
+    {
+        "label": "random",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "random",
+        "description": "random",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
+        "label": "ChatWidget",
+        "importPath": "widgets.chat_widget",
+        "description": "widgets.chat_widget",
+        "isExtraImport": true,
+        "detail": "widgets.chat_widget",
+        "documentation": {}
+    },
+    {
+        "label": "PlotInsightSignature",
+        "kind": 6,
+        "importPath": "widgets.chat_widget",
+        "description": "widgets.chat_widget",
+        "peekOfCode": "class PlotInsightSignature(dspy.Signature):\n    \"\"\"Give fast response to the user's query\"\"\"\n    plot_figure = dspy.InputField(desc=\"This will contain Plotly fig of the plot\")\n    data = dspy.InputField(desc=\"This will provide dataset in string format\")\n    user_query = dspy.InputField(desc=\"User's query\")\n    insights = dspy.OutputField(desc=\"Provide elaborated insight about the plot in MARKDOWN\")\n# ---------- Worker thread class ----------\nclass ModelWorker(QThread):\n    finished = Signal(str)  # emits response text\n    def __init__(self, user_query, data_text, plot_bytes):",
+        "detail": "widgets.chat_widget",
+        "documentation": {}
+    },
+    {
+        "label": "ModelWorker",
+        "kind": 6,
+        "importPath": "widgets.chat_widget",
+        "description": "widgets.chat_widget",
+        "peekOfCode": "class ModelWorker(QThread):\n    finished = Signal(str)  # emits response text\n    def __init__(self, user_query, data_text, plot_bytes):\n        super().__init__()\n        self.user_query = user_query\n        self.data_text = data_text\n        self.plot_bytes = plot_bytes\n    def run(self):\n        try:\n            model = dspy.ChainOfThought(signature=PlotInsightSignature)",
+        "detail": "widgets.chat_widget",
+        "documentation": {}
+    },
+    {
+        "label": "ChatWidget",
+        "kind": 6,
+        "importPath": "widgets.chat_widget",
+        "description": "widgets.chat_widget",
+        "peekOfCode": "class ChatWidget(QWidget):\n    def __init__(self, parent=None, table_editor: TableEditor | None = None, plot_widget: PlotWidget | None = None):\n        super().__init__(parent)\n        self.table_editor = table_editor\n        self.plot_widget = plot_widget\n        self.worker = None\n        layout = QVBoxLayout(self)\n        self.conv = QTextBrowser()\n        layout.addWidget(self.conv)\n        opts_layout = QHBoxLayout()",
+        "detail": "widgets.chat_widget",
+        "documentation": {}
+    },
+    {
+        "label": "llm",
+        "kind": 5,
+        "importPath": "widgets.chat_widget",
+        "description": "widgets.chat_widget",
+        "peekOfCode": "llm = dspy.LM(model=\"ollama/llama3.2:latest\")\ndspy.settings.configure(lm=llm)\nclass PlotInsightSignature(dspy.Signature):\n    \"\"\"Give fast response to the user's query\"\"\"\n    plot_figure = dspy.InputField(desc=\"This will contain Plotly fig of the plot\")\n    data = dspy.InputField(desc=\"This will provide dataset in string format\")\n    user_query = dspy.InputField(desc=\"User's query\")\n    insights = dspy.OutputField(desc=\"Provide elaborated insight about the plot in MARKDOWN\")\n# ---------- Worker thread class ----------\nclass ModelWorker(QThread):",
+        "detail": "widgets.chat_widget",
+        "documentation": {}
+    },
+    {
+        "label": "PlotWidget",
+        "kind": 6,
+        "importPath": "widgets.plot_widget",
+        "description": "widgets.plot_widget",
+        "peekOfCode": "class PlotWidget(QWidget):\n    def __init__(self, parent=None, table: QWidget | None = None):\n        super().__init__(parent)\n        main_layout = QVBoxLayout(self)\n        # === Controls Layout ===\n        ctrl_layout = QHBoxLayout()\n        self.axis_combo = QComboBox()\n        self.axis_combo.addItems([\"Column\", \"Row\"])\n        self.index_combo = QComboBox()\n        self.x_axis_combo = QComboBox()",
+        "detail": "widgets.plot_widget",
+        "documentation": {}
+    },
+    {
+        "label": "CSVLoaderWorker",
+        "kind": 6,
+        "importPath": "widgets.table_editor",
+        "description": "widgets.table_editor",
+        "peekOfCode": "class CSVLoaderWorker(QObject):\n    chunk_loaded = Signal(list)   # Emits list of rows (list[list[str]])\n    finished = Signal()\n    error = Signal(str)\n    def __init__(self, filepath, has_header=True, encoding=\"utf-8\", chunk_size=1000):\n        super().__init__()\n        self.filepath = filepath\n        self.has_header = has_header\n        self.encoding = encoding\n        self.chunk_size = chunk_size",
+        "detail": "widgets.table_editor",
+        "documentation": {}
+    },
+    {
+        "label": "TableEditor",
+        "kind": 6,
+        "importPath": "widgets.table_editor",
+        "description": "widgets.table_editor",
+        "peekOfCode": "class TableEditor(QWidget):\n    structure_changed = Signal()\n    data_changed = Signal()\n    def __init__(self):\n        super().__init__()\n        layout = QVBoxLayout(self)\n        # Toolbar\n        toolbar = QHBoxLayout()\n        add_row_btn = QPushButton(\"Add Row\")\n        add_col_btn = QPushButton(\"Add Column\")",
+        "detail": "widgets.table_editor",
+        "documentation": {}
+    },
+    {
+        "label": "AddFunctionDialog",
+        "kind": 6,
+        "importPath": "main",
+        "description": "main",
+        "peekOfCode": "class AddFunctionDialog(QDialog):\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"QtiPlot - Add function curve\")\n        self.setFixedSize(420, 450)\n        main_layout = QVBoxLayout(self)\n        # --- Curve Type ---\n        row1 = QHBoxLayout()\n        row1.addWidget(QLabel(\"Curve Type\"))\n        self.curve_type = QComboBox()",
+        "detail": "main",
+        "documentation": {}
+    },
+    {
+        "label": "MainWindow",
+        "kind": 6,
+        "importPath": "main",
+        "description": "main",
+        "peekOfCode": "class MainWindow(QMainWindow):\n    def __init__(self):\n        super().__init__()\n        self.setWindowTitle(\"QtPlot\")\n        self.resize(1200, 800)\n        # Workspace area \n        self.mdi = QMdiArea()\n        self.setCentralWidget(self.mdi)\n        self.create_default_table()\n        self.mdi.subWindowActivated.connect(self.on_subwindow_activated)",
+        "detail": "main",
+        "documentation": {}
+    },
+    {
+        "label": "BASE_DIR",
+        "kind": 5,
+        "importPath": "main",
+        "description": "main",
+        "peekOfCode": "BASE_DIR = os.path.dirname(os.path.abspath(__file__))\nclass AddFunctionDialog(QDialog):\n    def __init__(self, parent=None):\n        super().__init__(parent)\n        self.setWindowTitle(\"QtiPlot - Add function curve\")\n        self.setFixedSize(420, 450)\n        main_layout = QVBoxLayout(self)\n        # --- Curve Type ---\n        row1 = QHBoxLayout()\n        row1.addWidget(QLabel(\"Curve Type\"))",
+        "detail": "main",
+        "documentation": {}
+    }
+]
