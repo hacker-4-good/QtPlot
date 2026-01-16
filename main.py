@@ -33,8 +33,18 @@ class AddFunctionDialog(QDialog):
         row2.addWidget(self.commit_edit)
         main_layout.addLayout(row2)
 
-        # --- f(x) editor --- 
-        main_layout.addWidget(QLabel("f(x) ="))
+        # --- f(x) editor + Sigma button--- 
+        fx_row = QHBoxLayout()
+        fx_row.addWidget(QLabel("f(x) ="))
+
+        self.sigma_btn = QPushButton("Σ")
+        self.sigma_btn.setFixedWidth(32)
+        self.sigma_btn.setToolTip("Insert Function")
+        
+        fx_row.addWidget(self.sigma_btn)
+        fx_row.addStretch()
+        main_layout.addLayout(fx_row)
+
         self.function_edit = QTextEdit()
         main_layout.addWidget(self.function_edit)
 
@@ -75,6 +85,69 @@ class AddFunctionDialog(QDialog):
         btn_row.addWidget(self.close_btn)
 
         main_layout.addLayout(btn_row)
+
+        # --- Build function menu ---
+        self.build_function_menu()
+        self.sigma_btn.clicked.connect(self.show_function_menu)
+
+    # Function registry (A–Z, extend forever)
+    def get_function_registry(self):
+        return {
+            "a": ["abs", "acos", "acosh", "asin", "asinh", "atan", "atanh", "avg", "airyai", "airybi"],
+            "b": ["beta", "binomial", "bias"],
+            "c": ["ceil", "cos", "cosh", "cbrt", "cov"],
+            "d": ["deg2rad", "diff", "det"],
+            "e": ["exp", "erf", "erfc"],
+            "f": ["floor", "fact", "fft"],
+            "g": ["gcd", "gamma"],
+            "h": ["heaviside", "hypot"],
+            "i": ["int", "interp", "inv"],
+            "j": ["j0", "j1", "jn"],
+            "k": ["kurtosis"],
+            "l": ["log", "log10", "log2", "ln"],
+            "m": ["max", "min", "mean", "median", "mod"],
+            "n": ["norm"],
+            "o": ["ones"],
+            "p": ["pow", "prod", "poly", "pi"],
+            "q": ["quantile"],
+            "r": ["rad2deg", "round", "rand"],
+            "s": ["sin", "sinh", "sqrt", "std", "sum"],
+            "t": ["tan", "tanh", "trapz"],
+            "u": ["unique"],
+            "v": ["var", "vecnorm"],
+            "w": ["where"],
+            "x": ["xor"],
+            "y": ["y0", "y1", "yn"],
+            "z": ["zeros", "zeta"]
+        }
+
+    def build_function_menu(self):
+        self.func_menu = QMenu(self)
+        registry = self.get_function_registry()
+
+        for letter in 'abcdefghijklmnopqrstuvwxyz':
+            sub_menu = QMenu(letter.upper(), self.func_menu)
+            funcs = registry.get(letter, [])
+            if not funcs:
+                dummy = QAction("(no function yet)", self)
+                dummy.setEnabled(False)
+                sub_menu.addAction(dummy)
+            else:
+                for fname in sorted(funcs):
+                    act = QAction(fname, self)
+                    act.triggered.connect(lambda checked=False, n=fname: self.insert_function(n))
+                    sub_menu.addAction(act)
+            self.func_menu.addMenu(sub_menu)
+
+    def show_function_menu(self):
+        pos = self.sigma_btn.mapToGlobal(self.sigma_btn.rect().bottomLeft())
+        self.func_menu.exec(pos)
+    
+    def insert_function(self, name):
+        cursor = self.function_edit.textCursor()
+        cursor.insertText(name+"("+")")
+        self.function_edit.setTextCursor(cursor)
+        self.function_edit.setFocus()
 
 class MainWindow(QMainWindow):
     def __init__(self):
