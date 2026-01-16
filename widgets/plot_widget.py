@@ -262,3 +262,21 @@ class PlotWidget(QWidget):
         ax.set_title(f"{plot_type.capitalize()} Plot")
         self.figure.tight_layout()
         self.canvas.draw()
+
+    def plot_xy_data(self, x_vals, y_vals, title="Function Plot"):
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+
+        color = self.plot_styles.get("color", "tab:blue")
+        marker = self.plot_styles.get("marker", None)
+        linestyle = self.plot_styles.get("linestyle", "-")
+
+        ax.plot(x_vals, y_vals, color=color, linestyle=linestyle, marker=marker)
+
+        ax.set_xlabel("x")
+        ax.set_ylabel("f(x)")
+        ax.set_title(title)
+        ax.grid(True)
+
+        self.figure.tight_layout()
+        self.canvas.draw()

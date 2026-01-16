@@ -5,6 +5,7 @@ from widgets.table_editor import TableEditor
 from widgets.plot_widget import PlotWidget
 from widgets.chat_widget import ChatWidget
 import os, sys 
+import numpy as np 
 
 def resource_path(relative_path):
     if hasattr(sys, "_MEIPASS"):
@@ -89,6 +90,65 @@ class AddFunctionDialog(QDialog):
         # --- Build function menu ---
         self.build_function_menu()
         self.sigma_btn.clicked.connect(self.show_function_menu)
+
+        self.add_btn.clicked.connect(self.generate_and_plot)
+        self.ok_btn.clicked.connect(self.generate_and_plot)
+
+    
+    def generate_and_plot(self):
+        expr = self.function_edit.toPlainText().strip()
+        if not expr:
+            QMessageBox.warning(self, "Error", "Function expression is empty.")
+            return
+
+        from_x = self.from_spin.value()
+        to_x = self.to_spin.value()
+        n = self.point_spin.value()
+
+        if from_x == to_x:
+            QMessageBox.warning(self, "Error", "From and To cannot be equal.")
+            return
+
+        x = np.linspace(from_x, to_x, n)
+
+        # Replace ^ with **
+        expr = expr.replace("^", "**")
+
+        # Safe namespace
+        safe = {
+            "x": x,
+            "np": np,
+            "sin": np.sin,
+            "cos": np.cos,
+            "tan": np.tan,
+            "sinh": np.sinh,
+            "cosh": np.cosh,
+            "tanh": np.tanh,
+            "log": np.log,
+            "log10": np.log10,
+            "sqrt": np.sqrt,
+            "exp": np.exp,
+            "abs": np.abs,
+            "pi": np.pi,
+            "e": np.e,
+            "pow": np.power,
+            "floor": np.floor,
+            "ceil": np.ceil,
+        }
+
+        try:
+            y = eval(expr, {"__builtins__": {}}, safe)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to evaluate function:\n{e}")
+            return
+
+        # Send data to main window to plot
+        if hasattr(self.parent(), "plot_function_xy"):
+            title = self.commit_edit.text() or f"f(x) = {expr}"
+            self.parent().plot_function_xy(x, y, title)
+
+        self.accept()
+
 
     # Function registry (A–Z, extend forever)
     def get_function_registry(self):
@@ -459,6 +519,17 @@ class MainWindow(QMainWindow):
                 chat_widget.plot_widget = self.last_plot_widget
         self.chat_dock.show()
 
+    def plot_function_xy(self, x_vals, y_vals, title="Function Plot"):
+        plot_widget = PlotWidget(self, table=None)
+        # Plot directly
+        plot_widget.plot_xy_data(x_vals, y_vals, title)
+        sub = QMdiSubWindow()
+        sub.setWidget(plot_widget)
+        sub.setWindowTitle(title)
+        sub.resize(700, 500)
+        self.mdi.addSubWindow(sub)
+        sub.show()
+        self.mdi.setActiveSubWindow(sub)
 
 if __name__ == "__main__":
     app = QApplication([])
