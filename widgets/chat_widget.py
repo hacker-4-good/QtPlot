@@ -12,7 +12,14 @@ import os
 
 load_dotenv()
 
-llm = dspy.LM(model="ollama/llama3.2:latest")
+MISTRAL_API_KEY = "gXE96B7KdzeAAe22vKG53IJaI08I3VWK"
+
+llm = dspy.LM(
+    model = 'mistral-small', 
+    api_key = MISTRAL_API_KEY, 
+    api_base = "https://api.mistral.ai/v1/"
+)
+
 dspy.settings.configure(lm=llm)
 
 class PlotInsightSignature(dspy.Signature):
